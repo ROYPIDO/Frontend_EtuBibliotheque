@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RegisterComponent } from './register.component';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { UserService } from '../../core/service/user.service';
 import { UserMockService } from '../../core/service/user-mock.service';
 
@@ -89,10 +89,10 @@ describe('RegisterComponent (form behaviour)', () => {
     expect(userServiceMock.register).not.toHaveBeenCalled();
     expect(navigateSpy).not.toHaveBeenCalled();
     expect(component.submitted).toBe(true);
-    expect(root.textContent).toContain('First Name is required');
-    expect(root.textContent).toContain('Last Name is required');
-    expect(root.textContent).toContain('Login is required');
-    expect(root.textContent).toContain('password is required');
+    expect(root.textContent).toContain('Le prénom est obligatoire');
+    expect(root.textContent).toContain('Le nom est obligatoire');
+    expect(root.textContent).toContain("L'identifiant est obligatoire");
+    expect(root.textContent).toContain('Le mot de passe est obligatoire');
     expect(root.querySelectorAll('.is-invalid').length).toBe(4);
   });
 
@@ -113,6 +113,62 @@ describe('RegisterComponent (form behaviour)', () => {
     expect(userServiceMock.register).toHaveBeenCalledWith(valid);
     expect(alertSpy).toHaveBeenCalled();
     expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should mask the password field with type="password"', () => {
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('input[formControlName="password"]');
+    expect(input.type).toBe('password');
+  });
+
+  it('should not display any error message on a successful registration', () => {
+    userServiceMock.register.mockReturnValue(of({}));
+    component.registerForm.setValue(valid);
+
+    component.onSubmit();
+    fixture.detectChanges();
+
+    expect(alertSpy).toHaveBeenCalledWith('Inscription réussie !');
+    expect(component.errorMessage).toBe('');
+    expect(fixture.nativeElement.querySelector('.alert-danger')).toBeNull();
+  });
+
+  describe('HTTP error handling', () => {
+    const cases: [number, string][] = [
+      [409, 'Cet utilisateur existe déjà.'],
+      [400, 'Données invalides. Veuillez vérifier le formulaire.'],
+      [0, 'Serveur injoignable. Veuillez réessayer plus tard.'],
+      [500, 'Une erreur est survenue. Veuillez réessayer.'],
+    ];
+
+    it.each(cases)('should display the French message for status %i, without redirecting', (status, message) => {
+      userServiceMock.register.mockReturnValue(throwError(() => new HttpErrorResponse({ status })));
+      component.registerForm.setValue(valid);
+
+      component.onSubmit();
+      fixture.detectChanges();
+
+      expect(component.errorMessage).toBe(message);
+      expect(fixture.nativeElement.querySelector('.alert-danger')?.textContent).toContain(message);
+      expect(alertSpy).not.toHaveBeenCalled();
+      expect(navigateSpy).not.toHaveBeenCalled();
+    });
+
+    it('should clear the previous error on a new submit and on reset', () => {
+      userServiceMock.register.mockReturnValueOnce(throwError(() => new HttpErrorResponse({ status: 409 })));
+      component.registerForm.setValue(valid);
+      component.onSubmit();
+      expect(component.errorMessage).not.toBe('');
+
+      userServiceMock.register.mockReturnValueOnce(of({}));
+      component.onSubmit();
+      expect(component.errorMessage).toBe('');
+
+      userServiceMock.register.mockReturnValueOnce(throwError(() => new HttpErrorResponse({ status: 400 })));
+      component.onSubmit();
+      expect(component.errorMessage).not.toBe('');
+      component.onReset();
+      expect(component.errorMessage).toBe('');
+    });
   });
 
   it('onReset should clear the form and the submitted flag', () => {

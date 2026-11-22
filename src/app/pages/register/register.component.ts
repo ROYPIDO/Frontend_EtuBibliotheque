@@ -1,6 +1,7 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MaterialModule } from '../../shared/material.module';
 import { UserService } from '../../core/service/user.service';
@@ -21,6 +22,7 @@ export class RegisterComponent implements OnInit {
   private router = inject(Router);
   registerForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
+  errorMessage: string = '';
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group(
@@ -39,6 +41,7 @@ export class RegisterComponent implements OnInit {
 
   onSubmit(): void {
     this.submitted = true;
+    this.errorMessage = '';
     if (this.registerForm.invalid) {
       return;
     }
@@ -50,16 +53,28 @@ export class RegisterComponent implements OnInit {
     };
     this.userService.register(registerUser)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(
-      () => {
-        alert('SUCCESS!! :-)');
-        this.router.navigate(['/login']);
-      },
-    );
+      .subscribe({
+        next: () => {
+          alert('Inscription réussie !');
+          this.router.navigate(['/login']);
+        },
+        error: (err: HttpErrorResponse) => {
+          if (err.status === 409) {
+            this.errorMessage = 'Cet utilisateur existe déjà.';
+          } else if (err.status === 400) {
+            this.errorMessage = 'Données invalides. Veuillez vérifier le formulaire.';
+          } else if (err.status === 0) {
+            this.errorMessage = 'Serveur injoignable. Veuillez réessayer plus tard.';
+          } else {
+            this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+          }
+        }
+      });
   }
 
   onReset(): void {
     this.submitted = false;
+    this.errorMessage = '';
     this.registerForm.reset();
   }
 }

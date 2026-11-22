@@ -1,6 +1,9 @@
 <div class="card m-3">
   <h5 class="card-header">Registration Form</h5>
   <div class="card-body">
+    @if (errorMessage) {
+      <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+    }
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <div class="form-row">
         <div class="form-group col-5">
@@ -14,7 +17,7 @@
           @if (submitted && form['firstName'].errors) {
             <div class="invalid-feedback">
               @if (form['firstName'].errors?.['required']) {
-                <div>First Name is required</div>
+                <div>Le prénom est obligatoire</div>
               }
             </div>
           }
@@ -30,7 +33,7 @@
           @if (submitted && form['lastName'].errors) {
             <div class="invalid-feedback">
               @if (form['lastName'].errors?.['required']) {
-                <div>Last Name is required</div>
+                <div>Le nom est obligatoire</div>
               }
             </div>
           }
@@ -47,7 +50,7 @@
         @if (submitted && form['login'].errors) {
           <div class="invalid-feedback">
             @if (form['login'].errors?.['required']) {
-              <div>Login is required</div>
+              <div>L'identifiant est obligatoire</div>
             }
           </div>
         }
@@ -56,7 +59,7 @@
       <div class="form-group">
         <label>Password</label>
         <input
-          type="text"
+          type="password"
           formControlName="password"
           class="form-control"
           [ngClass]="{ 'is-invalid': submitted && form['password'].errors }"
@@ -64,7 +67,7 @@
         @if (submitted && form['password'].errors) {
           <div class="invalid-feedback">
             @if (form['password'].errors?.['required']) {
-              <div>password is required</div>
+              <div>Le mot de passe est obligatoire</div>
             }
           </div>
         }
