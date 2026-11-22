@@ -2,6 +2,7 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MaterialModule } from '../../shared/material.module';
 import { AuthService } from '../../core/service/auth.service';
@@ -18,6 +19,7 @@ export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private formBuilder = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
   loginForm: FormGroup = new FormGroup({});
   submitted: boolean = false;
   loading: boolean = false;
@@ -53,6 +55,7 @@ export class LoginComponent implements OnInit {
         next: () => {
           this.loading = false;
           this.successMessage = 'Connexion réussie.';
+          this.router.navigate(['/students']);
         },
         error: (err: HttpErrorResponse) => {
           this.loading = false;
