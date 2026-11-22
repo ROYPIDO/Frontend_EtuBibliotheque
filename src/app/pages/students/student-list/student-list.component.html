@@ -1,0 +1,49 @@
+<div class="card m-3">
+  <h5 class="card-header d-flex justify-content-between align-items-center">
+    Étudiants
+    <span>
+      <a class="btn btn-primary btn-sm mr-1" routerLink="/students/new">Ajouter un étudiant</a>
+      <button class="btn btn-outline-secondary btn-sm" type="button" (click)="onLogout()">Déconnexion</button>
+    </span>
+  </h5>
+  <div class="card-body">
+    @if (errorMessage) {
+      <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+    }
+
+    @if (loading) {
+      <div class="text-center" role="status">
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+        Chargement...
+      </div>
+    } @else if (students.length === 0) {
+      @if (!errorMessage) {
+        <p class="text-muted mb-0">Aucun étudiant pour le moment.</p>
+      }
+    } @else {
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>E-mail</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (student of students; track student.id) {
+            <tr>
+              <td>{{ student.firstName }}</td>
+              <td>{{ student.lastName }}</td>
+              <td>{{ student.email }}</td>
+              <td>
+                <a class="btn btn-secondary btn-sm mr-1" [routerLink]="['/students', student.id, 'edit']">Modifier</a>
+                <button class="btn btn-danger btn-sm" type="button" (click)="onDelete(student)">Supprimer</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

@@ -33,6 +33,11 @@ yarn-error.log
 .sass-cache/
 /connect.lock
 /coverage
+
+# Cypress (captures d'écran et vidéos générées)
+/cypress/screenshots
+/cypress/videos
+/cypress/downloads
 /libpeerconnection.log
 testem.log
 /typings

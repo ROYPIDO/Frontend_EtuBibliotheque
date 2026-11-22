@@ -1,0 +1,8 @@
+{
+  "newUser": {
+    "firstName": "Alice",
+    "lastName": "Testeur",
+    "login": "alice.testeur",
+    "password": "MotDePasseFictif-123"
+  }
+}
