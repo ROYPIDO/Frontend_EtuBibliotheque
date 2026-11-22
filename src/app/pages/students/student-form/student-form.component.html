@@ -1,0 +1,85 @@
+<div class="card m-3">
+  <h5 class="card-header">{{ isEditMode ? 'Modifier un étudiant' : 'Ajouter un étudiant' }}</h5>
+  <div class="card-body">
+    @if (errorMessage) {
+      <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+    }
+
+    @if (loading) {
+      <div class="text-center" role="status">
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+        Chargement...
+      </div>
+    }
+
+    <form [formGroup]="studentForm" (ngSubmit)="onSubmit()" [hidden]="loading">
+      <div class="form-group">
+        <label>Prénom</label>
+        <input
+          type="text"
+          formControlName="firstName"
+          class="form-control"
+          [ngClass]="{ 'is-invalid': submitted && form['firstName'].errors }"
+        />
+        @if (submitted && form['firstName'].errors) {
+          <div class="invalid-feedback">
+            @if (form['firstName'].errors?.['required']) {
+              <div>Le prénom est obligatoire</div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Nom</label>
+        <input
+          type="text"
+          formControlName="lastName"
+          class="form-control"
+          [ngClass]="{ 'is-invalid': submitted && form['lastName'].errors }"
+        />
+        @if (submitted && form['lastName'].errors) {
+          <div class="invalid-feedback">
+            @if (form['lastName'].errors?.['required']) {
+              <div>Le nom est obligatoire</div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>E-mail</label>
+        <input
+          type="email"
+          formControlName="email"
+          class="form-control"
+          [ngClass]="{ 'is-invalid': submitted && form['email'].errors }"
+        />
+        @if (submitted && form['email'].errors) {
+          <div class="invalid-feedback">
+            @if (form['email'].errors?.['required']) {
+              <div>L'e-mail est obligatoire</div>
+            }
+            @if (form['email'].errors?.['email']) {
+              <div>Le format de l'e-mail est invalide</div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="text-center">
+        <button class="btn btn-primary mr-1" type="submit" [disabled]="loading || submitting">
+          @if (submitting) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Enregistrement...
+          } @else {
+            Enregistrer
+          }
+        </button>
+        <button class="btn btn-secondary" type="button" (click)="onCancel()" [disabled]="submitting">
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

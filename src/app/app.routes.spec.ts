@@ -16,9 +16,25 @@ describe('app routes', () => {
       providers: [
         provideRouter(routes),
         { provide: AuthService, useValue: authService },
-        { provide: StudentService, useValue: { getAll: () => of([]) } }
+        { provide: StudentService, useValue: { getAll: () => of([]), getById: () => of({}) } }
       ]
     });
+  });
+
+  it.each(['/students/new', '/students/5/edit'])('should redirect %s to /login when not authenticated', async url => {
+    authService.isLoggedIn.mockReturnValue(false);
+
+    await RouterTestingHarness.create(url);
+
+    expect(TestBed.inject(Router).url).toBe('/login');
+  });
+
+  it.each(['/students/new', '/students/5/edit'])('should allow %s when authenticated', async url => {
+    authService.isLoggedIn.mockReturnValue(true);
+
+    await RouterTestingHarness.create(url);
+
+    expect(TestBed.inject(Router).url).toBe(url);
   });
 
   it('should redirect /students to /login when not authenticated', async () => {
