@@ -1,8 +1,9 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MaterialModule } from '../../../shared/material.module';
+import { AuthService } from '../../../core/service/auth.service';
 import { StudentService } from '../../../core/service/student.service';
 import { Student } from '../../../core/models/Student';
 
@@ -15,6 +16,8 @@ import { Student } from '../../../core/models/Student';
 })
 export class StudentListComponent implements OnInit {
   private studentService = inject(StudentService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   students: Student[] = [];
   loading: boolean = false;
@@ -39,6 +42,11 @@ export class StudentListComponent implements OnInit {
           this.errorMessage = 'Impossible de charger les étudiants. Veuillez réessayer.';
         }
       });
+  }
+
+  onLogout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   onDelete(student: Student): void {

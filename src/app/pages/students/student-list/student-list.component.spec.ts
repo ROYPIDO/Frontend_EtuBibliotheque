@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
 
 import { StudentListComponent } from './student-list.component';
+import { AuthService } from '../../../core/service/auth.service';
 import { StudentService } from '../../../core/service/student.service';
 import { Student } from '../../../core/models/Student';
 
@@ -11,6 +12,8 @@ describe('StudentListComponent', () => {
   let fixture: ComponentFixture<StudentListComponent>;
   let component: StudentListComponent;
   let studentServiceMock: { getAll: jest.Mock; delete: jest.Mock };
+  let authServiceMock: { logout: jest.Mock };
+  let navigateSpy: jest.SpyInstance;
 
   const students: Student[] = [
     { id: 1, firstName: 'Ada', lastName: 'Lovelace', email: 'ada@example.com', createdAt: '2025-01-01T10:00:00', updatedAt: '2025-01-01T10:00:00' },
@@ -25,15 +28,18 @@ describe('StudentListComponent', () => {
       imports: [StudentListComponent],
       providers: [
         provideRouter([]),
-        { provide: StudentService, useValue: studentServiceMock }
+        { provide: StudentService, useValue: studentServiceMock },
+        { provide: AuthService, useValue: authServiceMock }
       ]
     }).compileComponents();
+    navigateSpy = jest.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     fixture = TestBed.createComponent(StudentListComponent);
     component = fixture.componentInstance;
   }
 
   beforeEach(() => {
     studentServiceMock = { getAll: jest.fn(), delete: jest.fn() };
+    authServiceMock = { logout: jest.fn() };
   });
 
   afterEach(() => jest.restoreAllMocks());
@@ -93,6 +99,23 @@ describe('StudentListComponent', () => {
     expect(el().querySelector('a[href="/students/new"]')).not.toBeNull();
     expect(el().querySelector('a[href="/students/1/edit"]')).not.toBeNull();
     expect(el().querySelector('a[href="/students/2/edit"]')).not.toBeNull();
+  });
+
+  describe('logout', () => {
+    it('should call AuthService.logout then navigate to /login when clicking "Déconnexion"', async () => {
+      studentServiceMock.getAll.mockReturnValue(of(students));
+      await setup();
+      fixture.detectChanges();
+
+      const button = Array.from(el().querySelectorAll('button')).find(b => b.textContent?.includes('Déconnexion'));
+      expect(button).toBeDefined();
+      button?.click();
+
+      expect(authServiceMock.logout).toHaveBeenCalledTimes(1);
+      expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+      expect(authServiceMock.logout.mock.invocationCallOrder[0])
+        .toBeLessThan(navigateSpy.mock.invocationCallOrder[0]);
+    });
   });
 
   describe('delete', () => {
