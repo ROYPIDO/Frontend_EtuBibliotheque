@@ -1,0 +1,8 @@
+{
+  "extension": [".ts", ".html"],
+  "include": ["src/**/*.ts", "src/**/*.html"],
+  "exclude": ["src/**/*.spec.ts"],
+  "excludeAfterRemap": true,
+  "report-dir": "coverage-e2e/complet",
+  "reporter": ["html"]
+}

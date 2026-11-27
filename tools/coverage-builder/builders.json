@@ -1,0 +1,9 @@
+{
+  "builders": {
+    "dev-server": {
+      "implementation": "./dev-server.js",
+      "schema": "./dev-server.schema.json",
+      "description": "Serveur de développement Angular avec instrumentation Istanbul, réservé aux tests E2E."
+    }
+  }
+}
