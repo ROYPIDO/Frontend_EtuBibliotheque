@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "buildTarget": {
+      "type": "string",
+      "description": "Cible de build à servir (doit activer les source maps)."
+    },
+    "port": { "type": "number", "default": 4300 },
+    "host": { "type": "string", "default": "localhost" },
+    "watch": { "type": "boolean", "default": false },
+    "liveReload": { "type": "boolean", "default": false },
+    "hmr": { "type": "boolean", "default": false }
+  },
+  "additionalProperties": false,
+  "required": ["buildTarget"]
+}

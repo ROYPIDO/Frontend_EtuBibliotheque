@@ -69,6 +69,13 @@
           },
           "defaultConfiguration": "development"
         },
+        "serve-coverage": {
+          "builder": "./tools/coverage-builder:dev-server",
+          "options": {
+            "buildTarget": "etudiant-frontend:build:development",
+            "port": 4300
+          }
+        },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
         }

@@ -1,0 +1,5 @@
+{
+  "name": "coverage-builder",
+  "private": true,
+  "builders": "./builders.json"
+}
